@@ -1,0 +1,14 @@
+@startuml
+!define RECTANGLE << (R,#ADD8E6) >>
+
+RECTANGLE PDF_Reader as "PDF Reader"
+RECTANGLE Excel_Reader as "Excel Reader"
+RECTANGLE Text_Splitter as "Text Splitter"
+RECTANGLE FAISS_DB as "FAISS DB"
+RECTANGLE LLM as "LLM (QA System)"
+
+PDF_Reader --> Text_Splitter
+Excel_Reader --> Text_Splitter
+Text_Splitter --> FAISS_DB
+FAISS_DB --> LLM
+@enduml
