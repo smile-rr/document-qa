@@ -7,3 +7,6 @@ pypdf
 beautifulsoup4
 faiss-cpu
 pandas
+openpyxl
+unstructured>=0.6.7
+networkx

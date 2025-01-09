@@ -1,69 +1,67 @@
 
-from langchain.document_loaders import PyPDFLoader, CSVLoader ,UnstructuredExcelLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
-from langchain.chat_models import ChatOpenAI
+
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+from langchain_openai import ChatOpenAI
 import os
 from dotenv import find_dotenv, load_dotenv
-
-def read_pdf(file_path):
-    loader = PyPDFLoader(file_path)
-    documents = loader.load()
-    return documents
-
-def read_csv(file_path):
-    loader = CSVLoader(file_path)
-    documents = loader.load()
-    return documents
-
-def read_excel(file_path, mode="elements"):
-    if mode not in ["single", "elements"]:
-        raise ValueError("Invalid mode. Choose 'single' or 'elements'.")
-
-    loader = UnstructuredExcelLoader(file_path, mode=mode)
-    documents = loader.load()
-    return documents
+from document_reader import read_pdf, read_excel
+from vectorstore import VectorStore
 
 
-def split_documents(documents, chunk_size=500, chunk_overlap=50):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-    split_docs = text_splitter.split_documents(documents)
-    return split_docs
-
-
-def create_faiss_db(documents):
-    embeddings = OpenAIEmbeddings(base_url=os.environ['EMBEDDINGS_BASE_URL'])
-    vectorstore = FAISS.from_documents(documents, embeddings)
-    return vectorstore
 
 def create_qa_chain(vectorstore):
     retriever = vectorstore.as_retriever()
     llm = ChatOpenAI(model_name="gpt-3.5-turbo",
         openai_api_base=os.environ['CHATGPT_API_ENDPOINT'],
         openai_api_key=os.environ['OPENAI_API_KEY'],
-        temperature=0.1
+        temperature=0.1,
+        verbose=True
+        
         )
     qa_chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
     return qa_chain
+def create_conversation_qa_chain(vectorstore):
+    retriever = vectorstore.as_retriever()
+    llm = ChatOpenAI(
+        model_name="gpt-3.5-turbo",
+        openai_api_base=os.environ['CHATGPT_API_ENDPOINT'],
+        openai_api_key=os.environ['OPENAI_API_KEY'],
+        temperature=0.8,
+        verbose=True
+    )
+    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    qa_chain = ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        memory=memory
+    )
+    return qa_chain
 
+def qa(qa_chain):
+    print("Welcome to the QA system! Type 'exit' or 'bye' to quit.\n")
+    while True:
+        query = input("Q: ")
+        if query.lower() in ['exit', 'bye']:
+            print("\nExiting the QA system.")
+            break
+        answer = qa_chain.invoke(query)
+        print(f"\nA: {answer['result']}\n")
+def conversation_qa(qa_chain):
+    print("Welcome to the QA system! Type 'exit' or 'bye' to quit.\n")
+    while True:
+        query = input("Q: ")
+        if query.lower() in ['exit', 'bye']:
+            print("\nExiting the QA system.")
+            break
+        result = qa_chain.invoke({"question": query})
+        print(f"\nA: {result['answer']}\n")
 def main():
     load_dotenv(find_dotenv(), override=True)
-    PATH_EXCEL = "qa-doc/3Q24-SUPP-ForWeb.xlsx"
-    PATH_PDF = "qa-doc/3Q24-SUPP-ForWeb.pdf"
+    faiss_db = VectorStore(dir="./faiss_db")  # Load the FAISS vector store
+    qa_chain = create_conversation_qa_chain(faiss_db)
 
-    pdf_documents = read_pdf(PATH_EXCEL)
-    excel_documents = read_excel(PATH_PDF)
+    conversation_qa(qa_chain)
 
-    split_pdf_docs = split_documents(pdf_documents)
-    split_excel_docs = split_documents(excel_documents)
-
-    all_split_docs = split_pdf_docs + split_excel_docs
-    faiss_db = create_faiss_db(all_split_docs)
-
-    qa_chain = create_qa_chain(faiss_db)
-
-    query = "What is the main topic of the document?"
-    answer = qa_chain.run(query)
-    print("Answer:", answer)
+if __name__ == "__main__":
+    main()
