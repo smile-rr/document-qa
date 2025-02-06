@@ -10,3 +10,5 @@ pandas
 openpyxl
 unstructured>=0.6.7
 networkx
+rich
+langchain_google_vertexai
