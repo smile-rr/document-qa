@@ -3,7 +3,7 @@ from vectorstore import VectorStore
 import os
 from dotenv import load_dotenv, find_dotenv
 from langchain_openai import OpenAIEmbeddings
-from llm import create_llm
+from llm import create_chat_llm
 
 
 def test_vectorstore():

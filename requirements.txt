@@ -1,14 +1,26 @@
+# LangChain libraries
 langchain
 langchain-community
-openai
+langchain-google-vertexai
+langchain-ollama
 langchain-openai
-python-dotenv
-pypdf
-beautifulsoup4
+
+# Google Cloud AI Platform
+google-cloud-aiplatform
+
+# OpenAI library
+openai
+
+# FAISS library for vector search
 faiss-cpu
-pandas
-openpyxl
-unstructured>=0.6.7
+
+# Additional libraries
 networkx
+openpyxl
+pandas
+pypdf
+python-dotenv
 rich
-langchain_google_vertexai
+
+# Unstructured library with version constraint
+unstructured>=0.6.7

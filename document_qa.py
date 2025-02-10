@@ -1,15 +1,19 @@
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 import os
 from dotenv import find_dotenv, load_dotenv
-from vectorstore import VectorStore
-from llm import LLM
-from document_reader import DocumentReader
-
 from rich import print as rprint
-
 import logging
+import time
+
+from langchain.chains import RetrievalQA, ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
+
+from core.vectorstore import VectorStore, indexing_dir
+from core.llm import create_llm, create_embeddings, normalize_response
+from core.document_reader import to_documents, split_documents
+from core.llm_config import (
+    GPT_3_5, GEMINI_FLASH, GEMINI_PRO, OPENCHAT, LLAMA_3, LLAMA_3_VISION, DEEPSEEK_R1, QWEN_2_5,
+    TEXTEMBEDDING_GECKO, TEXTEMBEDDING_GECKO_MULTILINGUAL, OPENAI_EMBEDDING, OLLAMA_EMBEDDING
+)
 
 def create_qa_chain(llm, vectorstore):
     retriever = vectorstore.as_retriever()
@@ -17,7 +21,8 @@ def create_qa_chain(llm, vectorstore):
     return qa_chain
 
 def create_conversation_qa_chain(llm, vectorstore):
-    retriever = vectorstore.as_retriever()
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 10, "include_metadata": True})
+
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     qa_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
@@ -42,40 +47,28 @@ def qa(qa_chain):
 def conversation_qa(qa_chain):
     run_qa(qa_chain, lambda query: {"question": query})
 
-def initiate_with_files(embeddings, files, db_path="./faiss_db"):
-    if not files or len(files) == 0:
-        raise ValueError("No files provided")
-   
-    documents = DocumentReader.to_documents(files[0])
-    chunks = DocumentReader.split_documents(documents)
-    faiss_db = VectorStore(dir=db_path, embeddings=embeddings, documents=chunks)  
-    
-    for file in files[1:]:
-        documents = DocumentReader.to_documents(file)
-        chunks = DocumentReader.split_documents(documents)
-        faiss_db.add_documents(chunks)
 
-def list_files_in_dir(directory):
-    supported_extensions = ('.pdf', '.csv', '.xlsx', '.xls')
-    files = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(supported_extensions)]
-    if not files:
-        raise ValueError(f"No supported files found in directory: {directory}")
-    return files
 
-def document_qa(embeddings, db_path="./faiss_db"):
-    llm = LLM.create("gpt-3.5-turbo")
+def document_qa(llm, embeddings, db_path="./faiss_db"):
     faiss_db = VectorStore(dir=db_path, embeddings=embeddings)  
-    qa_chain = create_conversation_qa_chain(llm, faiss_db)
+    qa_chain = create_qa_chain(llm, faiss_db)
     conversation_qa(qa_chain)
-
-if __name__ == "__main__":
-    load_dotenv(find_dotenv(), override=True)
-    embeddings = OpenAIEmbeddings(base_url=os.environ['EMBEDDINGS_BASE_URL'])
     
-    # directory = "/Users/pc-rn/Documents/算法/AI"
-    # files = list_files_in_dir(directory)
-    # initiate_with_files(embeddings, files)
+def main():
+     # Clear the terminal
+    os.system('clear' if os.name == 'posix' else 'cls')
     
     logging.basicConfig(level=logging.DEBUG)
+    load_dotenv(find_dotenv(), override=True)
     
-    document_qa(embeddings)
+    llm = create_llm(LLAMA_3)
+    embeddings = create_embeddings(OLLAMA_EMBEDDING)
+    
+    # indexing_dir(embeddings, "qa-doc", db_path="./faiss_db")
+    
+    
+    # document_qa(llm, embeddings)
+    
+if __name__ == "__main__":
+    main()
+    
