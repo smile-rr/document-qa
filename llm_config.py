@@ -1,5 +1,6 @@
 # Define key variables for LLM models
 GPT_3_5 = "gpt-3.5-turbo"
+GPT_4_O = "gpt-4o-mini"
 GEMINI_FLASH = "gemini-2.0-flash-exp"
 GEMINI_PRO = "gemini-2.0-pro-exp-02-05"
 OPENCHAT = "openchat:latest"

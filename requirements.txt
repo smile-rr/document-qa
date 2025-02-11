@@ -21,6 +21,7 @@ pandas
 pypdf
 python-dotenv
 rich
+pymupdf
 
 # Unstructured library with version constraint
 unstructured>=0.6.7

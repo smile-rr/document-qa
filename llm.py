@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 import json
 from llm_config import (
-    GPT_3_5, GEMINI_FLASH, GEMINI_PRO, OPENCHAT, LLAMA_3, LLAMA_3_VISION, DEEPSEEK_R1, QWEN_2_5,
+    GPT_3_5, GPT_4_O, GEMINI_FLASH, GEMINI_PRO, OPENCHAT, LLAMA_3, LLAMA_3_VISION, DEEPSEEK_R1, QWEN_2_5,
     TEXTEMBEDDING_GECKO, TEXTEMBEDDING_GECKO_MULTILINGUAL, OPENAI_EMBEDDING, OLLAMA_EMBEDDING
 )
 
@@ -25,7 +25,7 @@ MODEL_CLASSES = {
 }
 
 def create_llm(model_name, model_type="chat", temperature=0.8, verbose=True, **kwargs):
-    if model_name in [GPT_3_5]:
+    if model_name in [GPT_3_5, GPT_4_O]:
         model_class = MODEL_CLASSES[model_type]["openai"]
         return model_class(
             model_name=model_name,
@@ -102,13 +102,14 @@ if __name__ == "__main__":
     )
     # Define a list of all model name variables
     model_names = [
-        GPT_3_5,
-        GEMINI_FLASH,
-        GEMINI_PRO,
+        GPT_4_O
+        # GPT_3_5,
+        # GEMINI_FLASH,
+        # GEMINI_PRO,
         # OPENCHAT,
-        LLAMA_3,
+        # LLAMA_3,
         # DEEPSEEK_R1,
-        QWEN_2_5
+        # QWEN_2_5
     ]
     
     query = "你的训练数据截止时间是到什么时候?"

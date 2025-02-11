@@ -1,8 +1,10 @@
-from langchain_community.document_loaders import PyPDFLoader, CSVLoader, UnstructuredExcelLoader
+from langchain_community.document_loaders import UnstructuredExcelLoader, CSVLoader, PyMuPDFLoader
+
 from dotenv import load_dotenv, find_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tiktoken
 import os
+
 
 def to_documents(file_path):
     if file_path.endswith('.pdf'):
@@ -15,10 +17,9 @@ def to_documents(file_path):
         raise ValueError(f"Unsupported file type for file: {file_path}")
 
 def read_pdf(file_path):
-    loader = PyPDFLoader(file_path)
+    loader = PyMuPDFLoader(file_path)
     documents = loader.load()
     return documents
-
 def read_csv(file_path):
     loader = CSVLoader(file_path)
     documents = loader.load()
