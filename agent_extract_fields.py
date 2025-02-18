@@ -10,9 +10,10 @@ from rich import print as rprint
 from langchain.prompts import PromptTemplate
 
 
-from document_reader import read_pdf, to_documents
-from llm import create_llm, create_embeddings
-from llm_config import QWEN_2_5, OLLAMA_EMBEDDING, GPT_3_5, OPENAI_EMBEDDING, LLAMA_3, LLAMA_3_VISION, GEMINI_PRO, DEEPSEEK_R1,GPT_4_O
+from llm_core.document_reader import read_pdf, to_documents
+from llm_core.llm import create_llm, create_embeddings
+from llm_core.llm_config import (QWEN_2_5, OLLAMA_EMBEDDING, GPT_3_5, OPENAI_EMBEDDING, LLAMA_3, LLAMA_3_VISION, 
+                                 GEMINI_PRO, DEEPSEEK_R1,GPT_4_O, QWEN_PLUS, QWEN_MAX)
 
 
 
@@ -60,7 +61,7 @@ prompt = PromptTemplate(
 )
 
 # --- Step 3: Initialize the LLM and build the extraction chain ---
-llm = create_llm(GPT_4_O, temperature=0.0)
+llm = create_llm(QWEN_MAX, temperature=0.0)
 # Build the chain using the pipe operator
 extraction_chain = prompt | llm
 

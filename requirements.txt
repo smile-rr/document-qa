@@ -1,5 +1,6 @@
 # LangChain libraries
 langchain
+langgraph
 langchain-community
 langchain-google-vertexai
 langchain-ollama
@@ -10,6 +11,9 @@ google-cloud-aiplatform
 
 # OpenAI library
 openai
+
+# aliyun
+dashscope
 
 # FAISS library for vector search
 faiss-cpu
@@ -22,6 +26,8 @@ pypdf
 python-dotenv
 rich
 pymupdf
+# progress bar
+tqdm 
 
 # Unstructured library with version constraint
 unstructured>=0.6.7

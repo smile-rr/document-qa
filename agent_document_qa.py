@@ -10,12 +10,9 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 
-from vectorstore import VectorStore, indexing_dir
-from llm import create_llm, create_embeddings
-from llm_config import (
-    GPT_3_5, GEMINI_FLASH, GEMINI_PRO, OPENCHAT, LLAMA_3, LLAMA_3_VISION, DEEPSEEK_R1, QWEN_2_5,
-    TEXTEMBEDDING_GECKO, TEXTEMBEDDING_GECKO_MULTILINGUAL, OPENAI_EMBEDDING, OLLAMA_EMBEDDING
-)
+from llm_core.vectorstore import VectorStore, indexing_dir
+from llm_core.llm import create_llm, create_embeddings
+from llm_core.llm_config import  *
 
 def run_qa(qa_chain, invoke_params):
     rprint("[blue]Welcome to the QA system! Type 'exit' or 'bye' to quit.\n")
@@ -56,11 +53,11 @@ def main():
      # Clear the terminal
     os.system('clear' if os.name == 'posix' else 'cls')
     
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.WARNING)  
     load_dotenv(find_dotenv(), override=True)
     
-    llm = create_llm(QWEN_2_5)
-    embeddings = create_embeddings(OLLAMA_EMBEDDING)
+    llm = create_llm(QWEN_PLUS)
+    embeddings = create_embeddings(DASHSCOPE_EMBEDDING)
     
     # indexing_dir(embeddings, "qa-doc")
     document_qa(llm, embeddings)
