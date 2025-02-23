@@ -29,9 +29,12 @@ def indexing_files(embeddings, files, db_path="./faiss_db"):
     print("Done adding files to faiss db")
     return db
 
+def load_vectorstore(embeddings, db_path="./faiss_db"):
+    return VectorStore(dir=db_path, embeddings=embeddings)
+
 def _list_files_in_dir(directory):
-    # supported_extensions = ('.pdf', '.csv', '.xlsx', '.xls')
-    supported_extensions = ('.pdf')
+    supported_extensions = ('.pdf', '.csv', '.xlsx', '.xls')
+    # supported_extensions = ('.xlsx')
     print(f"Looking for supported files in directory: {directory}, \nsupported extensions: {supported_extensions}")
     files = [os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(supported_extensions)]
     if not files:
@@ -122,9 +125,7 @@ if __name__ == "__main__":
     PATH_PDF = "qa-doc/3Q24-Earnings-Transcript.pdf"
 
     documents = to_documents(PATH_PDF)
-
     chunks = split_documents(documents)
-    
     embeddings = create_embeddings(OPENAI_EMBEDDING)
     # db = VectorStore(documents=chunks, dir="./faiss_db_3", embeddings=embeddings)
     # db = VectorStore(documents=chunks)

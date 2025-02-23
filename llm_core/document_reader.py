@@ -1,9 +1,11 @@
 from langchain_community.document_loaders import UnstructuredExcelLoader, CSVLoader, PyMuPDFLoader
-
+from langchain_core.documents import Document
+import pandas as pd
 from dotenv import load_dotenv, find_dotenv
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tiktoken
 import os
+
 
 def to_documents(file_path):
     if file_path.endswith('.pdf'):
@@ -11,7 +13,7 @@ def to_documents(file_path):
     elif file_path.endswith('.csv'):
         return read_csv(file_path)
     elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
-        return read_excel(file_path)
+        return read_excel_pd(file_path)
     else:
         raise ValueError(f"Unsupported file type for file: {file_path}")
 
@@ -30,6 +32,49 @@ def read_excel(file_path, mode="elements"):
 
     loader = UnstructuredExcelLoader(file_path, mode=mode)
     documents = loader.load()
+    return documents
+
+
+
+def read_excel_pd(file_path):
+    """
+    Reads an Excel file with multiple sheets, cleans the data by removing rows and columns with NaN values,
+    and strips leading and trailing spaces from column names and cell values. Converts each sheet into LangChain Document objects.
+
+    Args:
+        file_path (str): The path to the Excel file.
+
+    Returns:
+        list: A list of LangChain Document objects, each representing a sheet in the Excel file.
+    """
+    # Define a converter function to read all fields as strings
+    def convert_to_str(value):
+        return str(value)
+
+    # Read all sheets into a dictionary of DataFrames, treating all values as strings
+    sheets_dict = pd.read_excel(file_path, sheet_name=None, dtype=str, na_filter=False)
+
+    documents = []
+    for sheet_name, df in sheets_dict.items():
+         # Remove rows and columns with NaN values
+        df_cleaned = df.dropna(how='all', axis=0).dropna(how='all', axis=1)
+        
+        # Strip leading and trailing spaces from column names
+        df_cleaned.columns = df_cleaned.columns.str.strip()
+        
+        # Strip leading and trailing spaces from all string cells
+        df_cleaned = df_cleaned.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
+        
+        # Replace NaN values with an empty string
+        df_cleaned = df_cleaned.fillna('')
+        
+        # Convert the cleaned DataFrame to a string with SOH separator
+        text = df_cleaned.to_string(index=False, header=False)
+        
+        # Create a Document for each sheet
+        document = Document(page_content=text, metadata={"sheet_name": sheet_name})
+        documents.append(document)
+
     return documents
 
 def split_documents(documents, chunk_size=400, chunk_overlap=20):
@@ -55,9 +100,9 @@ if __name__ == "__main__":
     PATH_EXCEL = "qa-doc/3Q24-SUPP-ForWeb.xlsx"
     PATH_PDF = "qa-doc/3Q24-SUPP-ForWeb.pdf"
     
-    documents = to_documents(PATH_PDF)
-    # documents = to_documents(PATH_EXCEL)
-    print(documents[0].page_content[:500])
-    print(documents[0].metadata)
+    # documents = to_documents(PATH_PDF)
+    documents = to_documents(PATH_EXCEL)
+    print(documents[5].page_content[:10000])
+    print(documents[5].metadata)
     print()
     print(f"Number of documents: {len(documents)}, \nlength of first document: {len(documents[0].page_content)}")

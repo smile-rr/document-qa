@@ -56,10 +56,10 @@ def main():
     logging.basicConfig(level=logging.WARNING)  
     load_dotenv(find_dotenv(), override=True)
     
-    llm = create_llm(QWEN_PLUS)
-    embeddings = create_embeddings(DASHSCOPE_EMBEDDING)
+    llm = create_llm(GEMINI_PRO)
+    embeddings = create_embeddings(TEXTEMBEDDING_GECKO)
     
-    # indexing_dir(embeddings, "qa-doc")
+    indexing_dir(embeddings, "qa-doc")
     document_qa(llm, embeddings)
     
 if __name__ == "__main__":

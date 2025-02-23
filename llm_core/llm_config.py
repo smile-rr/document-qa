@@ -14,6 +14,6 @@ QWEN_MAX = "qwen-max"
 # Define key variables for embedding models
 TEXTEMBEDDING_GECKO = "textembedding-gecko"
 TEXTEMBEDDING_GECKO_MULTILINGUAL = "textembedding-gecko-multilingual"
-OPENAI_EMBEDDING = "text-embedding-3-small"
+OPENAI_EMBEDDING = "text-embedding-3-large" #"text-embedding-3-small"
 OLLAMA_EMBEDDING = "nomic-embed-text"
 DASHSCOPE_EMBEDDING = "text-embedding-v2"
