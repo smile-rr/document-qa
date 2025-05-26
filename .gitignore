@@ -3,6 +3,7 @@
 .env
 /__pycache__/
 /faiss*/**
+/faiss_db/
 /qa-doc/**
 /.env
 .env
