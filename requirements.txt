@@ -32,3 +32,7 @@ tabulate
 
 # Unstructured library with version constraint
 unstructured>=0.6.7
+
+# audio
+openai-whisper
+setuptools-rust

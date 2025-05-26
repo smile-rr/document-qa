@@ -4,3 +4,8 @@
 /__pycache__/
 /faiss*/**
 /qa-doc/**
+/.env
+.env
+.DS_Store
+/ignore-files/
+.venv/

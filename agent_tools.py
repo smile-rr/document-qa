@@ -9,28 +9,28 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv(), override=True)
 
 
-# 使用 @tool 装饰器定义计算年龄的工具
+# Use @tool decorator to define a tool for calculating age
 @tool("AgeCalculator", return_direct=True)
 def calculate_age(birth_date_str: str) -> str:
     """
     Useful for calculating a person's age given their birth date in the format YYYY - MM - DD.
     """
     try:
-        # 将输入的生日字符串转换为日期对象
+        # Convert the input birth date string to a date object
         birth_date = datetime.strptime(birth_date_str, "%Y-%m-%d")
         today = datetime.today()
-        # 计算年龄
+        # Calculate age
         age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
         return f"The age is {age} years old."
     except ValueError:
         return "Invalid date format. Please use YYYY - MM - DD."
 
-llm = create_llm(model_name=QWEN_PLUS)
+llm = create_llm(model_name=GPT_3_5)
 
-# 定义工具列表
+# Define the tool list
 tools = [calculate_age]
 
-# 初始化代理
+# Initialize the agent
 agent = initialize_agent(
     tools,
     llm,
@@ -38,7 +38,7 @@ agent = initialize_agent(
     verbose=True
 )
 
-# 运行查询
+# Run the query
 query = "What is the age of a person born on 1995-03-20?"
 try:
     result = agent.invoke(query)

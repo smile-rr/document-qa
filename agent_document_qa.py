@@ -33,9 +33,9 @@ def document_qa(llm, embeddings, db_path="./faiss_db"):
     retriever = vectorstore.as_retriever()
 
     system_prompt = (
-        "使用以下上下文回答问题：如果你不知道答案，请回答'我不知道'。"
-        "请简明扼要地回答，最多使用三句话。或者跟用户友好交流"
-        "上下文：{context}"
+        "Answer the question using the following context: If you don't know the answer, respond with 'I don't know'."
+        "Keep your answers concise, using no more than three sentences. Alternatively, engage with the user in a friendly manner."
+        "Context: {context}"
     )
     
     prompt = ChatPromptTemplate.from_messages([
@@ -51,17 +51,16 @@ def document_qa(llm, embeddings, db_path="./faiss_db"):
     
 def main():
      # Clear the terminal
-    os.system('clear' if os.name == 'posix' else 'cls')
+    # os.system('clear' if os.name == 'posix' else 'cls')
     
     logging.basicConfig(level=logging.WARNING)  
     load_dotenv(find_dotenv(), override=True)
     
-    llm = create_llm(GEMINI_PRO)
-    embeddings = create_embeddings(TEXTEMBEDDING_GECKO)
+    llm = create_llm(GPT_3_5)
+    embeddings = create_embeddings(OPENAI_EMBEDDING)
     
     indexing_dir(embeddings, "qa-doc")
     document_qa(llm, embeddings)
     
 if __name__ == "__main__":
     main()
-    
